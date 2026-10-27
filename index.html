@@ -128,7 +128,8 @@ function paymentProof(id){
  const t='COMPROVANTE DE REGISTRO INTERNO\nCliente: '+clientName(l?.clientId)+'\nData: '+fmtDate(p.date)+'\nValor registrado: '+money(p.amount)+'\nReferência: '+(p.note||'Pagamento')+'\nSaldo estimado: '+money(l?balance(l):0)+'\n\nNão é comprovante bancário.';
  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/plain;charset=utf-8'}));a.download='comprovante-'+p.id+'.txt';a.click();URL.revokeObjectURL(a.href);
 }
-\nrenderAll();
+
+renderAll();
 </script>
 <script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}</script></body>
 </html>
