@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#10251e">
+<meta name="theme-color" content="#10251e"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon.svg" type="image/svg+xml">
 <title>Painel de Empréstimos</title>
 <style>
 :root{--bg:#0b1713;--panel:#13251e;--panel2:#1a3027;--text:#f0f6f2;--muted:#a6b8af;--green:#60e6a2;--line:#2b4438;--red:#ff7878;--yellow:#f7d66d}
@@ -114,7 +114,21 @@ function exportData(){const blob=new Blob([JSON.stringify(db,null,2)],{type:'app
 function exportCSV(){const rows=[['Cliente','Capital','Taxa mensal (%)','Prazo meses','Estimativa total','Recebido','Saldo estimado','Início','Vencimento','Status'],...db.loans.map(l=>[clientName(l.clientId),l.principal,l.rate,l.months,estimate(l),paidFor(l.id),balance(l),l.startDate,l.dueDate,balance(l)<=.009?'Quitado':isLate(l)?'Em atraso':'Em aberto'])];const csv=rows.map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(';')).join('\r\n');const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='emprestimos.csv';a.click();URL.revokeObjectURL(a.href)}
 function clearAll(){if(confirm('Isso apagará clientes, empréstimos e pagamentos deste navegador. Exporte um backup antes. Continuar?')&&confirm('Confirmação final: apagar todos os dados?')){db={clients:[],loans:[],payments:[],rate:30};saveDB();notice('Dados locais apagados.')}}
 function esc(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-renderAll();
+
+function whatsappReminder(id){
+ const l=db.loans.find(x=>x.id===id);if(!l)return;
+ const cl=db.clients.find(x=>x.id===l.clientId)||{};
+ if(!cl.phone){notice('Cadastre o telefone do cliente com DDD.');return}
+ let phone=cl.phone.replace(/\D/g,'');if(phone.length===10||phone.length===11)phone='55'+phone;
+ const msg='Olá, '+cl.name+'. Lembrete do empréstimo: vencimento '+fmtDate(l.dueDate)+', saldo estimado '+money(balance(l))+'. Se já pagou, desconsidere. Obrigado.';
+ window.open('https://wa.me/'+phone+'?text='+encodeURIComponent(msg),'_blank');
+}
+function paymentProof(id){
+ const p=db.payments.find(x=>x.id===id);if(!p)return;const l=db.loans.find(x=>x.id===p.loanId);
+ const t='COMPROVANTE DE REGISTRO INTERNO\nCliente: '+clientName(l?.clientId)+'\nData: '+fmtDate(p.date)+'\nValor registrado: '+money(p.amount)+'\nReferência: '+(p.note||'Pagamento')+'\nSaldo estimado: '+money(l?balance(l):0)+'\n\nNão é comprovante bancário.';
+ const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([t],{type:'text/plain;charset=utf-8'}));a.download='comprovante-'+p.id+'.txt';a.click();URL.revokeObjectURL(a.href);
+}
+\nrenderAll();
 </script>
-</body>
+<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}</script></body>
 </html>
