@@ -132,31 +132,33 @@ function paymentProof(id){
 renderAll();
 </script>
 <script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}</script><script>
-/* Diagnóstico e eventos explícitos para navegadores móveis */
-window.addEventListener('error',function(e){console.error('Erro no painel:',e.message,e.filename,e.lineno);});
+/* Correção de abertura dos formulários em celular */
 (function(){
- function show(id){var el=document.getElementById(id);if(el)el.classList.add('open');return !!el;}
- function openNewLoan(){
-  try{
-   var clients=JSON.parse(localStorage.getItem('painelEmprestimosV1')||'{}').clients||[];
-   if(!clients.length){show('clientModal');return;}
-   var sel=document.getElementById('loanClient');
-   if(sel){sel.innerHTML=clients.map(function(x){return '<option value="'+String(x.id).replace(/&/g,'&amp;').replace(/"/g,'&quot;')+'">'+String(x.name||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</option>';}).join('');}
-   var form=document.getElementById('loanForm');if(form)form.reset();
-   var rate=document.getElementById('loanRate');if(rate)rate.value=30;
-   var months=document.getElementById('months');if(months)months.value=1;
-   var start=document.getElementById('startDate');if(start)start.value=new Date().toISOString().slice(0,10);
-   var due=document.getElementById('dueDate');if(due)due.value=new Date().toISOString().slice(0,10);
-   var title=document.getElementById('loanTitle');if(title)title.textContent='Novo empréstimo';
-   show('loanModal');
-  }catch(err){console.error(err);alert('Erro no cadastro: '+(err.message||err));}
- }
- document.addEventListener('click',function(e){
-  var b=e.target&&e.target.closest?e.target.closest('button'):null;if(!b)return;
-  if((b.textContent||'').toLowerCase().includes('novo empréstimo')){
-   e.preventDefault();e.stopPropagation();openNewLoan();
+ function clickHandler(e){
+  var el=e.target;
+  var b=el&&el.closest?el.closest('button'):null;
+  if(!b)return;
+  var action=b.getAttribute('onclick')||'';
+  var label=(b.textContent||'').toLowerCase();
+  if(action.indexOf('openLoan(')!==-1 || label.indexOf('novo empréstimo')!==-1){
+   e.preventDefault();
+   e.stopImmediatePropagation();
+   try {
+    if(typeof openLoan==='function') openLoan();
+    else {
+     var modal=document.getElementById('loanModal');
+     if(modal)modal.classList.add('open');
+     else alert('O formulário não foi encontrado. Atualize a página e tente novamente.');
+    }
+   } catch(err) {
+    console.error('Falha ao abrir empréstimo',err);
+    var modal=document.getElementById('loanModal');
+    if(modal)modal.classList.add('open');
+    else alert('Não foi possível abrir o formulário. Atualize a página.');
+   }
   }
- },true);
+ }
+ document.addEventListener('click',clickHandler,true);
 })();
 </script>
 </body>
