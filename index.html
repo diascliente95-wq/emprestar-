@@ -71,7 +71,7 @@ window.addEventListener('error',e=>console.error('Erro no painel:',e.message));
  arm();
  window.addEventListener('popstate',function(){openExit();});
  $('stayApp').addEventListener('click',closeExit);
- $('leaveApp').addEventListener('click',function(){asking=false;$('exitConfirm').classList.remove('open');try{history.back();}catch(e){}});
+ $('leaveApp').addEventListener('click',function(){asking=false;$('exitConfirm').classList.remove('open');try{history.go(-2);}catch(e){}try{window.close();}catch(e){}});
  window.addEventListener('keydown',function(e){if(e.key==='Escape'&&asking)closeExit();});
 })();
 render();
