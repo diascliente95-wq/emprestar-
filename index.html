@@ -131,5 +131,22 @@ function paymentProof(id){
 
 renderAll();
 </script>
-<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}</script></body>
+<script>if("serviceWorker" in navigator){addEventListener("load",()=>navigator.serviceWorker.register("./sw.js").catch(()=>{}))}</script><script>
+/* Compatibilidade de cliques e diagnóstico sem alterar o visual */
+window.addEventListener('error',function(e){console.error('Erro no painel:',e.message,e.filename,e.lineno);});
+document.addEventListener('DOMContentLoaded',function(){
+ const novo=document.querySelector('button[onclick="openLoan()"]');
+ if(novo){
+  novo.addEventListener('click',function(ev){
+   try{
+    if(typeof window.openLoan==='function'){window.openLoan();return;}
+    const cm=document.getElementById('clientModal');
+    if(cm){cm.classList.add('open');return;}
+    alert('O painel encontrou um erro ao carregar os comandos. Atualize a página e tente novamente.');
+   }catch(err){console.error(err);alert('Erro ao abrir cadastro: '+(err.message||err));}
+  });
+ }
+});
+</script>
+</body>
 </html>
