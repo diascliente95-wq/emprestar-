@@ -1,0 +1,18 @@
+{
+  "name": "Painel de Empréstimos",
+  "short_name": "Empréstimos",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0b1713",
+  "theme_color": "#10251e",
+  "description": "Controle de clientes, empréstimos e pagamentos",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
